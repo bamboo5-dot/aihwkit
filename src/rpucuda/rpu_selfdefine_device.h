@@ -24,25 +24,21 @@ BUILD_PULSED_DEVICE_META_PARAMETER(
     SelfDefine,
     /*implements*/
     DeviceUpdateType::SelfDefine,
-    /*parameter def*/
-    T ps_gamma = (T)1.0;
-    T ps_gamma_dtod = (T)0.0;
-    T ps_gamma_up_down = (T)0.00;
-    T ps_gamma_up_down_dtod = (T)0.00;
     
-    std::vector<T> def_up_pulse;
-    std::vector<T> def_up_weight;
-    std::vector<T> def_down_pulse;
-    std::vector<T> def_down_weight;
-    T def_n_points = (T)0.00;
+    /*parameter def*/    
+    std::vector<T> sd_up_pulse;
+    std::vector<T> sd_up_weight;
+    std::vector<T> sd_down_pulse;
+    std::vector<T> sd_down_weight;
+    T sd_n_points = (T)0.00;
     ,
     /*print body*/
-    ss << "\t ps_gamma:\t\t" << ps_gamma << "\t(dtod=" << ps_gamma_dtod << ")" << std::endl;
-    ss << "\t ps_gamma_up_down:\t" << ps_gamma_up_down << "\t(dtod=" << ps_gamma_up_down_dtod << ")"
+    ss << "\t(dtod=" << this->dw_min_dtod << ")" << std::endl;
+    ss << "\t up_down:\t" << this->up_down << "\t(dtod=" << this->up_down_dtod << ")"
        << std::endl;
     ,
     /* calc weight granularity body */
-    return this->dw_min * pow(0.5, ps_gamma);
+    return this->dw_min;
     ,
     /*Add*/
     bool implementsWriteNoise() const override { return true; };);

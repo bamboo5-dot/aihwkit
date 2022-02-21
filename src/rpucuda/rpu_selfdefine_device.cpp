@@ -23,47 +23,39 @@ namespace RPU {
  * Linear Step RPU Device
  *********************************************************************************/
 
-template <typename T>
-void SelfDefineRPUDevice<T>::populate(
-    const SelfDefineRPUDeviceMetaParameter<T> &p, RealWorldRNG<T> *rng) {
+// delete populate, use parent populate
+// template <typename T>
+// void SelfDefineRPUDevice<T>::populate(
+//     const SelfDefineRPUDeviceMetaParameter<T> &p, RealWorldRNG<T> *rng) {
 
-  PulsedRPUDevice<T>::populate(p, rng); // will clone par
-  auto &par = getPar();
+//   PulsedRPUDevice<T>::populate(p, rng); // will clone par
+//   auto &par = getPar();
 
-  T gamma = par.ps_gamma;
-  T gain_std = par.ps_gamma_dtod;
-  T up_down_std = par.ps_gamma_up_down_dtod;
-  T up_down = par.ps_gamma_up_down;
+//   T gain_std = par.sd_gamma_dtod;
+//   T up_down_std = par.sd_gamma_up_down_dtod;
+//   T up_down = par.sd_gamma_up_down;
 
-  std::vector<T> def_up_pulse = par.def_up_pulse;
-  std::vector<T> def_up_weight = par.def_up_weight;
-  std::vector<T> def_down_pulse = par.def_down_pulse;
-  std::vector<T> def_down_weight = par.def_down_weight;
-  T def_n_points = par.def_n_points;
+//   T up_bias = up_down > 0 ? (T)0.0 : up_down;
+//   T down_bias = up_down > 0 ? -up_down : (T)0.0;
 
-  T up_bias = up_down > 0 ? (T)0.0 : up_down;
-  T down_bias = up_down > 0 ? -up_down : (T)0.0;
+//   // use scale_up/down instead of gamma_up/down
+//   // scale_up/down are dtod in this case (for every point)
+//   for (int i = 0; i < this->d_size_; ++i) {
+//     for (int j = 0; j < this->x_size_; ++j) {
 
-  for (int i = 0; i < this->d_size_; ++i) {
-    for (int j = 0; j < this->x_size_; ++j) {
+//       T gain = (T)1.0 + gain_std * rng->sampleGauss();
+//       T r = up_down_std * rng->sampleGauss();
 
-      T gain = (T)1.0 + gain_std * rng->sampleGauss();
-      T r = up_down_std * rng->sampleGauss();
+//       w_gamma_up_[i][j] = (up_bias + gain + r);
+//       w_gamma_down_[i][j] = (down_bias + gain - r);
 
-      w_gamma_up_[i][j] = (up_bias + gain + r) * gamma;
-      w_gamma_down_[i][j] = (down_bias + gain - r) * gamma;
-
-      if (par.enforce_consistency) {
-        w_gamma_up_[i][j] = fabs(w_gamma_up_[i][j]);
-        w_gamma_down_[i][j] = fabs(w_gamma_down_[i][j]);
-      }
-    }
-  }
-
-  // for (int i = 0; i < this->def_n_points; ++i){
-
-  // }
-}
+//       if (par.enforce_consistency) {
+//         w_gamma_up_[i][j] = fabs(w_gamma_up_[i][j]);
+//         w_gamma_down_[i][j] = fabs(w_gamma_down_[i][j]);
+//       }
+//     }
+//   }
+// }
 
 template <typename T> void SelfDefineRPUDevice<T>::printDP(int x_count, int d_count) const {
 
@@ -115,17 +107,12 @@ inline void update_once(
     const T &dw_min_std,
     const T &write_noise_std,
     RNG<T> *rng) {
-  T range = max_bound - min_bound;
-  if (range == 0.0) {
-    return;
-  }
-  if (sign > 0) {
-    w -= scale_down * pow((w - min_bound) / range, gamma_down) *
-         ((T)1.0 + dw_min_std * rng->sampleGauss());
-  } else {
-    w += scale_up * pow((max_bound - w) / range, gamma_up) *
-         ((T)1.0 + dw_min_std * rng->sampleGauss());
-  }
+
+  // if (sign > 0){
+  //   w -= // interpolated * scale_up/down * rng
+  // } else {
+  //   w += 
+  // }
   w = MAX(w, min_bound);
   w = MIN(w, max_bound);
 
@@ -150,6 +137,20 @@ void SelfDefineRPUDevice<T>::doSparseUpdate(
   T *w_apparent = weights[i];
   T *min_bound = this->w_min_bound_[i];
   T *max_bound = this->w_max_bound_[i];
+  
+  std::vector<T> sd_up_pulse = par.sd_up_pulse;
+  std::vector<T> sd_up_weight = par.sd_up_weight;
+  std::vector<T> sd_down_pulse = par.sd_down_pulse;
+  std::vector<T> sd_down_weight = par.sd_down_weight;
+  T n_points = par.sd_n_points;
+
+  // interpolate here?
+  // array of j length?
+  // i row idx
+  // j col idx
+  for(int i = 0; i < n_points; i++){
+    // ask about j = total number of interpolated points?
+  }
 
   T write_noise_std = par.getScaledWriteNoise();
   PULSED_UPDATE_W_LOOP(update_once(

@@ -818,25 +818,17 @@ class SelfDefineDevice(PulsedDevice):
 
     bindings_class: ClassVar[Type] = devices.SelfDefineResistiveDeviceParameter
 
-    pow_gamma: float = 1.0
-
-    pow_gamma_dtod: float = 0.1
-
-    pow_up_down: float = 0.0
-
-    pow_up_down_dtod: float = 0.0
-
     write_noise_std: float = 0.0
 
-    def_up_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    sd_up_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
-    def_up_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    sd_up_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
-    def_down_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    sd_down_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
-    def_down_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    sd_down_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
-    def_n_points: float=0.0
+    sd_n_points: float = 0.0
 
 ###############################################################################
 # Specific devices based on ``unit cell``.

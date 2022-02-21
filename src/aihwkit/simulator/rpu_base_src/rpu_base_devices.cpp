@@ -712,16 +712,12 @@ void declare_rpu_devices(py::module &m) {
 
   py::class_<SelfDefineParam, PySelfDefineParam, PulsedParam>(m, "SelfDefineResistiveDeviceParameter")
       .def(py::init<>())
-      .def_readwrite("pow_gamma", &SelfDefineParam::ps_gamma)
-      .def_readwrite("pow_gamma_dtod", &SelfDefineParam::ps_gamma_dtod)
-      .def_readwrite("pow_up_down", &SelfDefineParam::ps_gamma_up_down)
-      .def_readwrite("pow_up_down_dtod", &SelfDefineParam::ps_gamma_up_down_dtod)
       .def_readwrite("write_noise_std", &SelfDefineParam::write_noise_std)
-      .def_readwrite("def_up_pulse", &SelfDefineParam::def_up_pulse)
-      .def_readwrite("def_up_weight", &SelfDefineParam::def_up_weight)
-      .def_readwrite("def_down_pulse", &SelfDefineParam::def_down_pulse)
-      .def_readwrite("def_down_weight", &SelfDefineParam::def_down_weight)
-      .def_readwrite("def_n_points", &SelfDefineParam::def_n_points)
+      .def_readwrite("sd_up_pulse", &SelfDefineParam::sd_up_pulse)
+      .def_readwrite("sd_up_weight", &SelfDefineParam::sd_up_weight)
+      .def_readwrite("sd_down_pulse", &SelfDefineParam::sd_down_pulse)
+      .def_readwrite("sd_down_weight", &SelfDefineParam::sd_down_weight)
+      .def_readwrite("sd_n_points", &SelfDefineParam::sd_n_points)
       .def(
           "__str__",
           [](SelfDefineParam &self) {
