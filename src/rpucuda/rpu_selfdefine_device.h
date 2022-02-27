@@ -114,18 +114,18 @@ template <typename T> class SelfDefineRPUDevice : public PulsedRPUDevice<T> {
 
   );
 
-  void printDP(int x_count, int d_count) const override;
+  // void printDP(int x_count, int d_count) const override;
 
-  inline T **getGammaUp() const { return w_gamma_up_; };
-  inline T **getGammaDown() const { return w_gamma_down_; };
+  // inline T **getGammaUp() const { return w_gamma_up_; };
+  // inline T **getGammaDown() const { return w_gamma_down_; };
 
   void doSparseUpdate(
       T **weights, int i, const int *x_signed_indices, int x_count, int d_sign, RNG<T> *rng)
       override;
   void doDenseUpdate(T **weights, int *coincidences, RNG<T> *rng) override;
 
-private:
-  T **w_gamma_up_ = nullptr;
-  T **w_gamma_down_ = nullptr;
+// private:
+//   T **w_gamma_up_ = nullptr;
+//   T **w_gamma_down_ = nullptr;
 };
 } // namespace RPU

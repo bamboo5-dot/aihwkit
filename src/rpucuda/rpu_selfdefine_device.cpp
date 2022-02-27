@@ -75,9 +75,7 @@ template <typename T> void SelfDefineRPUDevice<T>::printDP(int x_count, int d_co
       std::cout << "[<" << this->w_max_bound_[i][j] << ",";
       std::cout << this->w_min_bound_[i][j] << ">,<";
       std::cout << this->w_scale_up_[i][j] << ",";
-      std::cout << this->w_scale_down_[i][j] << ">,<";
-      std::cout << w_gamma_up_[i][j] << ",";
-      std::cout << w_gamma_down_[i][j] << ">]";
+      std::cout << this->w_scale_down_[i][j] << ">]";
       std::cout.precision(10);
       std::cout << this->w_decay_scale_[i][j] << ", ";
       std::cout.precision(6);
@@ -100,24 +98,23 @@ inline void update_once(
     int &sign,
     T &scale_down,
     T &scale_up,
-    T &gamma_down,
-    T &gamma_up,
     T &min_bound,
     T &max_bound,
+    T &interpolated,
     const T &dw_min_std,
     const T &write_noise_std,
     RNG<T> *rng) {
 
-  // if (sign > 0){
-  //   w -= // interpolated * scale_up/down * rng
-  // } else {
-  //   w += 
-  // }
+  if (sign > 0){
+    w -= interpolated * scale_down * ((T)1.0 + dw_min_std * rng->sampleGauss());
+  } else {
+    w += interpolated * scale_up * ((T)1.0 + dw_min_std * rng->sampleGauss());
+  }
   w = MAX(w, min_bound);
   w = MIN(w, max_bound);
 
   if (write_noise_std > (T)0.0) {
-    w_apparent = w + write_noise_std * rng->sampleGauss();
+    w_apparent = w + write_noise_std * ((T)1.0 + dw_min_std * rng->sampleGauss());
   }
 }
 
@@ -131,8 +128,6 @@ void SelfDefineRPUDevice<T>::doSparseUpdate(
 
   T *scale_down = this->w_scale_down_[i];
   T *scale_up = this->w_scale_up_[i];
-  T *gamma_down = w_gamma_down_[i];
-  T *gamma_up = w_gamma_up_[i];
   T *w = par.usesPersistentWeight() ? this->w_persistent_[i] : weights[i];
   T *w_apparent = weights[i];
   T *min_bound = this->w_min_bound_[i];
@@ -148,14 +143,13 @@ void SelfDefineRPUDevice<T>::doSparseUpdate(
   // array of j length?
   // i row idx
   // j col idx
-  for(int i = 0; i < n_points; i++){
-    // ask about j = total number of interpolated points?
+  for(int n = 0; n < n_points; i++) {
+    
   }
 
   T write_noise_std = par.getScaledWriteNoise();
   PULSED_UPDATE_W_LOOP(update_once(
-                           w[j], w_apparent[j], sign, scale_down[j], scale_up[j], gamma_down[j],
-                           gamma_up[j], min_bound[j], max_bound[j], par.dw_min_std, write_noise_std,
+                           w[j], w_apparent[j], sign, scale_down[j], scale_up[j], min_bound[j], max_bound[j], interpolated, par.dw_min_std, write_noise_std,
                            rng););
 }
 
@@ -166,8 +160,6 @@ void SelfDefineRPUDevice<T>::doDenseUpdate(T **weights, int *coincidences, RNG<T
 
   T *scale_down = this->w_scale_down_[0];
   T *scale_up = this->w_scale_up_[0];
-  T *gamma_down = w_gamma_down_[0];
-  T *gamma_up = w_gamma_up_[0];
   T *w = par.usesPersistentWeight() ? this->w_persistent_[0] : weights[0];
   T *w_apparent = weights[0];
   T *min_bound = this->w_min_bound_[0];
@@ -176,7 +168,7 @@ void SelfDefineRPUDevice<T>::doDenseUpdate(T **weights, int *coincidences, RNG<T
 
   PULSED_UPDATE_W_LOOP_DENSE(update_once(
                                  w[j], w_apparent[j], sign, scale_down[j], scale_up[j],
-                                 gamma_down[j], gamma_up[j], min_bound[j], max_bound[j],
+                                 min_bound[j], max_bound[j],
                                  par.dw_min_std, write_noise_std, rng););
 }
 
