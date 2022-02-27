@@ -23,73 +23,6 @@ namespace RPU {
  * Linear Step RPU Device
  *********************************************************************************/
 
-// delete populate, use parent populate
-// template <typename T>
-// void SelfDefineRPUDevice<T>::populate(
-//     const SelfDefineRPUDeviceMetaParameter<T> &p, RealWorldRNG<T> *rng) {
-
-//   PulsedRPUDevice<T>::populate(p, rng); // will clone par
-//   auto &par = getPar();
-
-//   T gain_std = par.sd_gamma_dtod;
-//   T up_down_std = par.sd_gamma_up_down_dtod;
-//   T up_down = par.sd_gamma_up_down;
-
-//   T up_bias = up_down > 0 ? (T)0.0 : up_down;
-//   T down_bias = up_down > 0 ? -up_down : (T)0.0;
-
-//   // use scale_up/down instead of gamma_up/down
-//   // scale_up/down are dtod in this case (for every point)
-//   for (int i = 0; i < this->d_size_; ++i) {
-//     for (int j = 0; j < this->x_size_; ++j) {
-
-//       T gain = (T)1.0 + gain_std * rng->sampleGauss();
-//       T r = up_down_std * rng->sampleGauss();
-
-//       w_gamma_up_[i][j] = (up_bias + gain + r);
-//       w_gamma_down_[i][j] = (down_bias + gain - r);
-
-//       if (par.enforce_consistency) {
-//         w_gamma_up_[i][j] = fabs(w_gamma_up_[i][j]);
-//         w_gamma_down_[i][j] = fabs(w_gamma_down_[i][j]);
-//       }
-//     }
-//   }
-// }
-
-template <typename T> void SelfDefineRPUDevice<T>::printDP(int x_count, int d_count) const {
-
-  if (x_count < 0 || x_count > this->x_size_) {
-    x_count = this->x_size_;
-  }
-
-  if (d_count < 0 || d_count > this->d_size_) {
-    d_count = this->d_size_;
-  }
-  bool persist_if = getPar().usesPersistentWeight();
-
-  for (int i = 0; i < d_count; ++i) {
-    for (int j = 0; j < x_count; ++j) {
-      std::cout.precision(5);
-      std::cout << i << "," << j << ": ";
-      std::cout << "[<" << this->w_max_bound_[i][j] << ",";
-      std::cout << this->w_min_bound_[i][j] << ">,<";
-      std::cout << this->w_scale_up_[i][j] << ",";
-      std::cout << this->w_scale_down_[i][j] << ">]";
-      std::cout.precision(10);
-      std::cout << this->w_decay_scale_[i][j] << ", ";
-      std::cout.precision(6);
-      std::cout << this->w_diffusion_rate_[i][j] << ", ";
-      std::cout << this->w_reset_bias_[i][j];
-      if (persist_if) {
-        std::cout << ", " << this->w_persistent_[i][j];
-      }
-      std::cout << "]";
-    }
-    std::cout << std::endl;
-  }
-}
-
 namespace {
 template <typename T>
 inline void update_once(
@@ -138,19 +71,21 @@ void SelfDefineRPUDevice<T>::doSparseUpdate(
   std::vector<T> sd_down_pulse = par.sd_down_pulse;
   std::vector<T> sd_down_weight = par.sd_down_weight;
   T n_points = par.sd_n_points;
+  T interpolated = 0.0;
 
   // interpolate here?
   // array of j length?
   // i row idx
   // j col idx
   for(int n = 0; n < n_points; i++) {
-    
+    interpolated = n;
   }
 
   T write_noise_std = par.getScaledWriteNoise();
   PULSED_UPDATE_W_LOOP(update_once(
-                           w[j], w_apparent[j], sign, scale_down[j], scale_up[j], min_bound[j], max_bound[j], interpolated, par.dw_min_std, write_noise_std,
-                           rng););
+                           w[j], w_apparent[j], sign, scale_down[j], scale_up[j], 
+                           min_bound[j], max_bound[j], interpolated, par.dw_min_std, 
+                           write_noise_std, rng););
 }
 
 template <typename T>
@@ -165,11 +100,12 @@ void SelfDefineRPUDevice<T>::doDenseUpdate(T **weights, int *coincidences, RNG<T
   T *min_bound = this->w_min_bound_[0];
   T *max_bound = this->w_max_bound_[0];
   T write_noise_std = par.getScaledWriteNoise();
+  T interpolated = 0.0;
 
   PULSED_UPDATE_W_LOOP_DENSE(update_once(
-                                 w[j], w_apparent[j], sign, scale_down[j], scale_up[j],
-                                 min_bound[j], max_bound[j],
-                                 par.dw_min_std, write_noise_std, rng););
+                               w[j], w_apparent[j], sign, scale_down[j], scale_up[j], 
+                               min_bound[j], max_bound[j], interpolated, par.dw_min_std, 
+                               write_noise_std, rng););
 }
 
 template class SelfDefineRPUDevice<float>;

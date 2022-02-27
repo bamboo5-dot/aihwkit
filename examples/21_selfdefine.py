@@ -24,7 +24,15 @@ plot_device_compact(
                                                                    def_down_weight=down_weight,
                                                                    def_n_points=n_points), n_steps=1000)
 '''
-dw_min=0.0,dw_min_dtod=0.0,dw_min_std=0.0,up_down=0.0,up_down_dtod=0.0,w_max=0.0,w_max_dtod=0.0,w_min=0.0,w_min_dtod=0.0
+dw_min=0.0,
+dw_min_dtod=0.0,
+dw_min_std=0.0,
+up_down=0.0,
+up_down_dtod=0.0,
+w_max=0.0,
+w_max_dtod=0.0,
+w_min=0.0,
+w_min_dtod=0.0
 '''
 plt.show()
 plt.savefig('my_figure.png')
