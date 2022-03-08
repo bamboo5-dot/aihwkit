@@ -17,21 +17,23 @@ n_points = 5
 
 plt.ion()
 plot_device_compact(
-    SelfDefineDevice(w_min=-1, w_max=1, dw_min=1.0, w_min_dtod=0.0, w_max_dtod=0.0, dw_min_std=0.0, dw_min_dtod=0.0, up_down_dtod=0.0, up_down=0.0,
+    SelfDefineDevice(w_min=-1, w_max=1, dw_min=1.0, w_min_dtod=0.0, w_max_dtod=0.0, dw_min_std=0.0, dw_min_dtod=0.0, up_down_dtod=0.0,
                                                                    def_up_pulse=up_pulse, 
                                                                    def_up_weight=up_weight, 
                                                                    def_down_pulse=down_pulse, 
                                                                    def_down_weight=down_weight,
                                                                    def_n_points=n_points), n_steps=1000)
 '''
-dw_min=0.0,
+no dtod params
+
+dw_min=1.0,
 dw_min_dtod=0.0,
 dw_min_std=0.0,
 up_down=0.0,
 up_down_dtod=0.0,
-w_max=0.0,
+w_max=1,
 w_max_dtod=0.0,
-w_min=0.0,
+w_min=-1,
 w_min_dtod=0.0
 '''
 plt.show()

@@ -33,15 +33,16 @@ inline void update_once(
     T &scale_up,
     T &min_bound,
     T &max_bound,
-    T &interpolated,
+    T &interpolated_down,
+    T &interpolated_up,
     const T &dw_min_std,
     const T &write_noise_std,
     RNG<T> *rng) {
 
   if (sign > 0){
-    w -= interpolated * scale_down * ((T)1.0 + dw_min_std * rng->sampleGauss());
+    w = interpolated_down * scale_down * ((T)1.0 + dw_min_std * rng->sampleGauss());
   } else {
-    w += interpolated * scale_up * ((T)1.0 + dw_min_std * rng->sampleGauss());
+    w = interpolated_up * scale_up * ((T)1.0 + dw_min_std * rng->sampleGauss());
   }
   w = MAX(w, min_bound);
   w = MIN(w, max_bound);
@@ -71,20 +72,28 @@ void SelfDefineRPUDevice<T>::doSparseUpdate(
   std::vector<T> sd_down_pulse = par.sd_down_pulse;
   std::vector<T> sd_down_weight = par.sd_down_weight;
   T n_points = par.sd_n_points;
-  T interpolated = 0.0;
+  T interpolated_down = 0.0;
+  T interpolated_up = 0.0;
 
   // interpolate here?
   // array of j length?
   // i row idx
   // j col idx
-  for(int n = 0; n < n_points; i++) {
-    interpolated = n;
+  for (int n = 0; n < n_points - 1; n++) {
+    if (*w <= sd_up_weight[n] && *w >= sd_up_weight[n + 1]) {
+      interpolated_up = sd_up_pulse[n] + ((*w - sd_up_weight[n]) * (sd_up_pulse[n + 1] - sd_up_pulse[n]) / (sd_up_weight[n + 1] - sd_up_weight[n]));
+      break;
+    }
+    if (*w <= sd_down_weight[n] && *w >= sd_down_weight[n + 1]) {
+      interpolated_down = sd_down_pulse[n] + ((*w - sd_down_weight[n]) * (sd_down_pulse[n + 1] - sd_down_pulse[n]) / (sd_down_weight[n + 1] - sd_down_weight[n]));
+      break;
+    }
   }
 
   T write_noise_std = par.getScaledWriteNoise();
   PULSED_UPDATE_W_LOOP(update_once(
                            w[j], w_apparent[j], sign, scale_down[j], scale_up[j], 
-                           min_bound[j], max_bound[j], interpolated, par.dw_min_std, 
+                           min_bound[j], max_bound[j], interpolated_down, interpolated_up, par.dw_min_std, 
                            write_noise_std, rng););
 }
 
@@ -100,11 +109,27 @@ void SelfDefineRPUDevice<T>::doDenseUpdate(T **weights, int *coincidences, RNG<T
   T *min_bound = this->w_min_bound_[0];
   T *max_bound = this->w_max_bound_[0];
   T write_noise_std = par.getScaledWriteNoise();
-  T interpolated = 0.0;
+
+  std::vector<T> sd_up_pulse = par.sd_up_pulse;
+  std::vector<T> sd_up_weight = par.sd_up_weight;
+  std::vector<T> sd_down_pulse = par.sd_down_pulse;
+  std::vector<T> sd_down_weight = par.sd_down_weight;
+  T n_points = par.sd_n_points;
+
+  T interpolated_down = 0.0;
+  T interpolated_up = 0.0;
+
+  for (int n = 0; n < n_points - 1; n++) {
+    if (*w <= sd_up_weight[n] && *w >= sd_up_weight[n + 1]) {
+      interpolated_up = sd_up_pulse[n] + ((*w - sd_up_weight[n]) * (sd_up_pulse[n + 1] - sd_up_pulse[n]) / (sd_up_weight[n + 1] - sd_up_weight[n]));
+      interpolated_down = sd_down_pulse[n] + ((*w - sd_down_weight[n]) * (sd_down_pulse[n + 1] - sd_down_pulse[n]) / (sd_down_weight[n + 1] - sd_down_weight[n]));
+      break;
+    }
+  }
 
   PULSED_UPDATE_W_LOOP_DENSE(update_once(
                                w[j], w_apparent[j], sign, scale_down[j], scale_up[j], 
-                               min_bound[j], max_bound[j], interpolated, par.dw_min_std, 
+                               min_bound[j], max_bound[j], interpolated_down, interpolated_up, par.dw_min_std, 
                                write_noise_std, rng););
 }
 
