@@ -288,11 +288,11 @@ def get_tile_for_plotting(
                 set_noise_free(dev)
         if hasattr(config.device, 'device'):
             set_noise_free(getattr(config.device, 'device'))
-
+    print("python get_file_for_plotting test 5")
     analog_tile = AnalogTile(n_traces, 1, config)  # type: BaseTile
+    print("python get_file_for_plotting test 6")
     analog_tile.set_learning_rate(1)
     w_min = getattr(config.device.as_bindings(), 'w_min', -1.0)
-
     weights = w_min * ones((n_traces, 1))
     analog_tile.set_weights(weights)
 
@@ -473,10 +473,11 @@ def plot_device_compact(
     n_loops = 2
     total_iters = n_loops*2*n_steps
     direction = np.sign(np.sin(np.pi*(np.arange(total_iters)+1)/n_steps))
-
+    print("python visualization test 1")
     analog_tile = get_tile_for_plotting(rpu_config, n_traces, use_cuda, noise_free=False)
     w_trace = compute_pulse_response(analog_tile, direction, use_forward=True)\
         .reshape(-1, n_traces)
+    print("python visualization test 2")
     axis = figure.add_subplot(1, 1, 1)
     axis.plot(w_trace, linewidth=1)
     axis.set_title(analog_tile.rpu_config.device.__class__.__name__)
