@@ -714,9 +714,9 @@ void declare_rpu_devices(py::module &m) {
       .def(py::init<>())
       .def_readwrite("write_noise_std", &SelfDefineParam::write_noise_std)
       .def_readwrite("sd_up_pulse", &SelfDefineParam::sd_up_pulse)
-      .def_readwrite("sd_up_weight", &SelfDefineParam::sd_up_weight)
+      // .def_readwrite("sd_up_weight", &SelfDefineParam::sd_up_weight)
       .def_readwrite("sd_down_pulse", &SelfDefineParam::sd_down_pulse)
-      .def_readwrite("sd_down_weight", &SelfDefineParam::sd_down_weight)
+      // .def_readwrite("sd_down_weight", &SelfDefineParam::sd_down_weight)
       .def_readwrite("sd_n_points", &SelfDefineParam::sd_n_points)
       .def(
           "__str__",

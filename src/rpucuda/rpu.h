@@ -163,6 +163,7 @@ template <typename T> struct SimpleMetaParameter {
   };
 
   RPUSimple<T> *createRPUArray(int x_size, int d_size) {
+    printf("idk here lol");
     auto *rpu = new RPUSimple<T>(x_size, d_size);
     rpu->populateParameter(this);
     return rpu;

@@ -822,11 +822,11 @@ class SelfDefineDevice(PulsedDevice):
 
     sd_up_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
-    sd_up_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    # sd_up_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
     sd_down_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
-    sd_down_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    # sd_down_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
     sd_n_points: float = 0.0
 

@@ -54,7 +54,9 @@ template <typename T> void PulsedMetaParameter<T>::initialize() {
 template <typename T>
 RPUPulsed<T> *PulsedMetaParameter<T>::createRPUArray(
     int x_size, int d_size, AbstractRPUDeviceMetaParameter<T> *dp) {
+      printf("createRPUArray\n");
   auto *rpu = new RPUPulsed<T>(x_size, d_size);
+  // printf("populating parameters\n");
   rpu->populateParameter(this, dp);
   return rpu;
 };

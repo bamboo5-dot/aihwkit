@@ -29,6 +29,7 @@ void PowStepRPUDevice<T>::populate(
 
   PulsedRPUDevice<T>::populate(p, rng); // will clone par
   auto &par = getPar();
+  printf("populating powstep\n");
 
   T gamma = par.ps_gamma;
   T gain_std = par.ps_gamma_dtod;

@@ -45,8 +45,7 @@ inline void update_once(
     const T &write_noise_std,
     RNG<T> *rng) {
 
-// compute interpolation here
-std::cout << "test";
+std::cout << "selfdefine test update_once";
   if (sign > 0){
     w -= interpolated_down * scale_down * ((T)1.0 + dw_min_std * rng->sampleGauss());
   } else {
@@ -76,9 +75,9 @@ void SelfDefineRPUDevice<T>::doSparseUpdate(
   T *max_bound = this->w_max_bound_[i];
   
   std::vector<T> sd_up_pulse = par.sd_up_pulse;
-  std::vector<T> sd_up_weight = par.sd_up_weight;
+  // std::vector<T> sd_up_weight = par.sd_up_weight;
   std::vector<T> sd_down_pulse = par.sd_down_pulse;
-  std::vector<T> sd_down_weight = par.sd_down_weight;
+  // std::vector<T> sd_down_weight = par.sd_down_weight;
   T n_points = par.sd_n_points;
   T interpolated_down = 0.0;
   T interpolated_up = 0.0;
