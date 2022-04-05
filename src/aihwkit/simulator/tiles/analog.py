@@ -197,9 +197,9 @@ class AnalogTile(BaseTile):
             # pylint: disable=import-outside-toplevel
             from aihwkit.simulator.configs import SingleRPUConfig
             rpu_config = SingleRPUConfig()
-        print("analog test 1")
+        print("analog.py init 1")
         super().__init__(out_size, in_size, rpu_config, bias, in_trans, out_trans)
-        print("analog test 2")
+        print("analog.py init 2")
 
     def cpu(self) -> 'BaseTile':
         """Return a copy of this tile in CPU memory.
@@ -270,11 +270,11 @@ class AnalogTile(BaseTile):
         Returns:
             a simulator tile based on the specified configuration.
         """
-        print("analog.py test 1")
+        print("analog.py _create_simulator_tile 1")
         meta_parameter = rpu_config.as_bindings()
         device_parameter = rpu_config.device.as_bindings()
-        print("analog.py test 2")
-        print(device_parameter)
+        print("analog.py _create_simulator_tile 2")
+        # print(device_parameter)
         return meta_parameter.create_array(x_size, d_size, device_parameter)
 
 

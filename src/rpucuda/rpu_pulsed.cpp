@@ -54,10 +54,10 @@ template <typename T> void PulsedMetaParameter<T>::initialize() {
 template <typename T>
 RPUPulsed<T> *PulsedMetaParameter<T>::createRPUArray(
     int x_size, int d_size, AbstractRPUDeviceMetaParameter<T> *dp) {
-      printf("createRPUArray\n");
   auto *rpu = new RPUPulsed<T>(x_size, d_size);
-  // printf("populating parameters\n");
+  printf("rpu_pulsed.cpp createRPUArray 1\n");
   rpu->populateParameter(this, dp);
+  printf("rpu_pulsed.cpp createRPUArray 2\n");
   return rpu;
 };
 
@@ -402,6 +402,7 @@ void RPUPulsed<T>::populateParameter(
 
   // note: dp could also be SimpleRPUDeviceMetaParameter
   RealWorldRNG<T> rng(dp->construction_seed);
+  printf("rpu_pulsed.cpp populateParameter 1\n");
   if (p->up.pulse_type == PulseType::None) {
 
     if (dynamic_cast<SimpleRPUDeviceMetaParameter<T> *>(dp) == nullptr) {
@@ -412,9 +413,10 @@ void RPUPulsed<T>::populateParameter(
     rpu_device_ = dp_simple.createDeviceUnique(this->x_size_, this->d_size_, &rng);
   } else {
     // create and populate correct device
+    printf("rpu_pulsed.cpp populateParameter 2\n");
     rpu_device_ = dp->createDeviceUnique(this->x_size_, this->d_size_, &rng);
+    printf("rpu_pulsed.cpp populateParameter 3\n");
   }
-
   // update weights to obey bounds etc. (they might be set already)
   rpu_device_->onSetWeights(this->getWeightsPtr());
 

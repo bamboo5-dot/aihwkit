@@ -20,13 +20,14 @@
 namespace RPU {
 
 /********************************************************************************
- * Linear Step RPU Device
+ * Self Defined RPU Device
  *********************************************************************************/
 
 template <typename T>
 void SelfDefineRPUDevice<T>::populate(
     const SelfDefineRPUDeviceMetaParameter<T> &p, RealWorldRNG<T> *rng) {
       SelfDefineRPUDevice<T>::populate(p, rng);
+      printf("rpu_selfdefine_device.cpp populate");
 }
 
 namespace {
@@ -45,7 +46,7 @@ inline void update_once(
     const T &write_noise_std,
     RNG<T> *rng) {
 
-std::cout << "selfdefine test update_once";
+  printf("rpu_selfdefine_device.cpp update_once");
   if (sign > 0){
     w -= interpolated_down * scale_down * ((T)1.0 + dw_min_std * rng->sampleGauss());
   } else {
@@ -65,6 +66,7 @@ template <typename T>
 void SelfDefineRPUDevice<T>::doSparseUpdate(
     T **weights, int i, const int *x_signed_indices, int x_count, int d_sign, RNG<T> *rng) {
 
+  printf("rpu_selfdefine_device.cpp doSparseUpdate");
   const auto &par = getPar();
 
   T *scale_down = this->w_scale_down_[i];
@@ -74,10 +76,8 @@ void SelfDefineRPUDevice<T>::doSparseUpdate(
   T *min_bound = this->w_min_bound_[i];
   T *max_bound = this->w_max_bound_[i];
   
-  std::vector<T> sd_up_pulse = par.sd_up_pulse;
-  // std::vector<T> sd_up_weight = par.sd_up_weight;
-  std::vector<T> sd_down_pulse = par.sd_down_pulse;
-  // std::vector<T> sd_down_weight = par.sd_down_weight;
+//   std::vector<T> sd_up_pulse = par.sd_up_pulse;
+//   std::vector<T> sd_down_pulse = par.sd_down_pulse;
   T n_points = par.sd_n_points;
   T interpolated_down = 0.0;
   T interpolated_up = 0.0;
@@ -92,6 +92,7 @@ void SelfDefineRPUDevice<T>::doSparseUpdate(
 template <typename T>
 void SelfDefineRPUDevice<T>::doDenseUpdate(T **weights, int *coincidences, RNG<T> *rng) {
 
+  printf("rpu_selfdefine_device.cpp doDenseUpdate");
   const auto &par = getPar();
 
   T *scale_down = this->w_scale_down_[0];
@@ -102,28 +103,26 @@ void SelfDefineRPUDevice<T>::doDenseUpdate(T **weights, int *coincidences, RNG<T
   T *max_bound = this->w_max_bound_[0];
   T write_noise_std = par.getScaledWriteNoise();
 
-  std::vector<T> sd_up_pulse = par.sd_up_pulse;
-  // std::vector<T> sd_up_weight = par.sd_up_weight;
-  std::vector<T> sd_down_pulse = par.sd_down_pulse;
-  // std::vector<T> sd_down_weight = par.sd_down_weight;
+//   std::vector<T> sd_up_pulse = par.sd_up_pulse;
+//   std::vector<T> sd_down_pulse = par.sd_down_pulse;
   T n_points = par.sd_n_points;
 
   T interpolated_down = 0.0;
   T interpolated_up = 0.0;
 
-  for (int n = 0; n < n_points - 1; n++) {
-    T increment = abs(*max_bound - *min_bound) / n_points;
-    T sd_up_weight = *max_bound - (increment * n);
-    T sd_down_weight = *min_bound + (increment * n);
-    T sd_up_weight_next = *max_bound - (increment * (n + 1));
-    T sd_down_weight_next = *min_bound + (increment * (n + 1));
+//   for (int n = 0; n < n_points - 1; n++) {
+//     T increment = abs(*max_bound - *min_bound) / n_points;
+//     T sd_up_weight = *max_bound - (increment * n);
+//     T sd_down_weight = *min_bound + (increment * n);
+//     T sd_up_weight_next = *max_bound - (increment * (n + 1));
+//     T sd_down_weight_next = *min_bound + (increment * (n + 1));
 
-    if (*w <= sd_up_weight && *w >= sd_up_weight_next) {
-      interpolated_up = sd_up_pulse[n] + ((*w - sd_up_weight) * (sd_up_pulse[n + 1] - sd_up_pulse[n]) / (sd_up_weight_next - sd_up_weight));
-      interpolated_down = sd_down_pulse[n] + ((*w - sd_down_weight) * (sd_down_pulse[n + 1] - sd_down_pulse[n]) / (sd_down_weight_next - sd_down_weight));
-      break;
-    }
-  }
+//     if (*w <= sd_up_weight && *w >= sd_up_weight_next) {
+//       interpolated_up = sd_up_pulse[n] + ((*w - sd_up_weight) * (sd_up_pulse[n + 1] - sd_up_pulse[n]) / (sd_up_weight_next - sd_up_weight));
+//       interpolated_down = sd_down_pulse[n] + ((*w - sd_down_weight) * (sd_down_pulse[n + 1] - sd_down_pulse[n]) / (sd_down_weight_next - sd_down_weight));
+//       break;
+//     }
+//   }
 
   PULSED_UPDATE_W_LOOP_DENSE(update_once(
                                w[j], w_apparent[j], sign, scale_down[j], scale_up[j], 

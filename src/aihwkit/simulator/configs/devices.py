@@ -818,15 +818,11 @@ class SelfDefineDevice(PulsedDevice):
 
     bindings_class: ClassVar[Type] = devices.SelfDefineResistiveDeviceParameter
 
-    write_noise_std: float = 0.0
+    # write_noise_std: float = 0.0
 
-    sd_up_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    # sd_up_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
-    # sd_up_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
-
-    sd_down_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
-
-    # sd_down_weight: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    # sd_down_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
 
     sd_n_points: float = 0.0
 
