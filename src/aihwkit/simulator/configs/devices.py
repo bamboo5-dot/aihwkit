@@ -818,16 +818,6 @@ class SelfDefineDevice(PulsedDevice):
 
     bindings_class: ClassVar[Type] = devices.SelfDefineResistiveDeviceParameter
 
-    pow_gamma: float = 1.0
-
-    pow_gamma_dtod: float = 0.1
-
-    pow_up_down: float = 0.0
-
-    pow_up_down_dtod: float = 0.0
-
-    write_noise_std: float = 0.0
-
     n_points: int = 0
 
     up_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
