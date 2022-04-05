@@ -27,6 +27,7 @@ void declare_rpu_devices(py::module &m) {
   using TransferParam = RPU::TransferRPUDeviceMetaParameter<T>;
   using MixedPrecParam = RPU::MixedPrecRPUDeviceMetaParameter<T>;
   using PowStepParam = RPU::PowStepRPUDeviceMetaParameter<T>;
+  using SelfDefineParam = RPU::SelfDefineRPUDeviceMetaParameter<T>;
   using BufferedTransferParam = RPU::BufferedTransferRPUDeviceMetaParameter<T>;
 
   /*
@@ -277,6 +278,27 @@ void declare_rpu_devices(py::module &m) {
     }
     T calcWeightGranularity() const override {
       PYBIND11_OVERLOAD(T, PowStepParam, calcWeightGranularity, );
+    }
+  };
+
+  class PySelfDefineParam : public SelfDefineParam {
+  public:
+    std::string getName() const override {
+      PYBIND11_OVERLOAD(std::string, SelfDefineParam, getName, );
+    }
+    SelfDefineParam *clone() const override {
+      PYBIND11_OVERLOAD(SelfDefineParam *, SelfDefineParam, clone, );
+    }
+    RPU::DeviceUpdateType implements() const override {
+      PYBIND11_OVERLOAD(RPU::DeviceUpdateType, SelfDefineParam, implements, );
+    }
+    RPU::SelfDefineRPUDevice<T> *
+    createDevice(int x_size, int d_size, RPU::RealWorldRNG<T> *rng) override {
+      PYBIND11_OVERLOAD(
+          RPU::SelfDefineRPUDevice<T> *, SelfDefineParam, createDevice, x_size, d_size, rng);
+    }
+    T calcWeightGranularity() const override {
+      PYBIND11_OVERLOAD(T, SelfDefineParam, calcWeightGranularity, );
     }
   };
 
@@ -659,6 +681,32 @@ void declare_rpu_devices(py::module &m) {
           })
       .def(
           "calc_weight_granularity", &PowStepParam::calcWeightGranularity,
+          R"pbdoc(
+        Calculates the granularity of the weights (typically ``dw_min``)
+
+        Returns:
+           float: weight granularity
+        )pbdoc");
+
+  py::class_<SelfDefineParam, PySelfDefineParam, PulsedParam>(m, "SelfDefineResistiveDeviceParameter")
+      .def(py::init<>())
+      .def_readwrite("pow_gamma", &SelfDefineParam::ps_gamma)
+      .def_readwrite("pow_gamma_dtod", &SelfDefineParam::ps_gamma_dtod)
+      .def_readwrite("pow_up_down", &SelfDefineParam::ps_gamma_up_down)
+      .def_readwrite("pow_up_down_dtod", &SelfDefineParam::ps_gamma_up_down_dtod)
+      .def_readwrite("write_noise_std", &SelfDefineParam::write_noise_std)
+      .def_readwrite("n_points", &SelfDefineParam::sd_n_points)
+      .def_readwrite("up_pulse", &SelfDefineParam::sd_up_pulse)
+      .def_readwrite("down_pulse", &SelfDefineParam::sd_down_pulse)
+      .def(
+          "__str__",
+          [](SelfDefineParam &self) {
+            std::stringstream ss;
+            self.printToStream(ss);
+            return ss.str();
+          })
+      .def(
+          "calc_weight_granularity", &SelfDefineParam::calcWeightGranularity,
           R"pbdoc(
         Calculates the granularity of the weights (typically ``dw_min``)
 

@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 from aihwkit.utils.visualization import plot_device_compact
 from aihwkit.simulator.configs.devices import SelfDefineDevice
 
+# define up/down pulse vs weight relationship
+# n number of points in array
 n_points = 5
 up_pulse = [0.001, 0.002, 0.003, 0.004, 0.005]
 down_pulse = [0.005, 0.004, 0.003, 0.002, 0.001]
