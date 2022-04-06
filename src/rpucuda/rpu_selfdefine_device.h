@@ -28,7 +28,7 @@ BUILD_PULSED_DEVICE_META_PARAMETER(
     /*parameter def*/    
     std::vector<T> sd_up_pulse;
     std::vector<T> sd_down_pulse;
-    T sd_n_points = (T)0;
+    T sd_n_points = (T)0.00;
     ,
     /*print body*/
     ss << "\t(dtod=" << this->dw_min_dtod << ")" << std::endl;

@@ -28,24 +28,6 @@ void SelfDefineRPUDevice<T>::populate(
     const SelfDefineRPUDeviceMetaParameter<T> &p, RealWorldRNG<T> *rng) {
 
   PulsedRPUDevice<T>::populate(p, rng); // will clone par
-//   auto &par = getPar();
-//   T n_points = par.sd_n_points;
-//   if ((int)n_points < 2){
-//       printf("Not enough points to interpolate")
-//   }
-
-//   T n_points = par.sd_n_points;
-//   std::vector<T> sd_up_pulse = par.sd_up_pulse;
-//   std::vector<T> sd_down_pulse = par.sd_down_pulse;
-//   printf("points: %d\n", (int)n_points);
-//   printf("up pulse\n");
-//   for(auto i: sd_up_pulse){
-//       printf("%f\n", i);
-//   }
-//   printf("down pulse\n");
-//   for(auto i: sd_down_pulse){
-//       printf("%f\n", i);
-//   }
 }
 
 namespace {
@@ -64,14 +46,10 @@ inline void update_once(
     const T &write_noise_std,
     RNG<T> *rng) {
 
-//   printf("\n\nsign: %d\n", sign);
-  if (sign > 0){
-  printf("\nw: %f\n", w);
-  printf("scale_down: %f\n", scale_down);
-    w -= interpolated_down * scale_down * ((T)1.0 + dw_min_std * rng->sampleGauss());
-  printf("w: %f\n", w);
+  if (sign > 0) {
+    w -= interpolated_down * ((T)1.0 + dw_min_std * rng->sampleGauss());
   } else {
-    w += interpolated_up * scale_up * ((T)1.0 + dw_min_std * rng->sampleGauss());
+    w += interpolated_up * ((T)1.0 + dw_min_std * rng->sampleGauss());
   }
   w = MAX(w, min_bound);
   w = MIN(w, max_bound);
@@ -107,25 +85,12 @@ void SelfDefineRPUDevice<T>::doSparseUpdate(
   for (int n = 0; n < n_points - 1; n++) {
     T increment = abs(*max_bound - *min_bound) / (n_points - 1);
     T sd_up_weight = *max_bound - (increment * n);
-    T sd_down_weight = *min_bound + (increment * n);
     T sd_up_weight_next = *max_bound - (increment * (n + 1));
-    T sd_down_weight_next = *min_bound + (increment * (n + 1));
-    // printf("\nincrement: %f\n", increment);
-    // printf("sd_up_weight: %f\n", sd_up_weight);
-    // printf("sd_down_weight: %f\n", sd_down_weight);
-    // printf("sd_up_weight_next: %f\n", sd_up_weight_next);
-    // printf("sd_down_weight_next: %f\n", sd_down_weight_next);
-
-    // printf("\nsd_up_pulse[%d]: %f\n", n, sd_up_pulse[n]);
-    // printf("*w: %f\n", *w);
-    // printf("sd_up_weight: %f\n", sd_up_weight);
-    // printf("sd_up_pulse[%d]: %f\n", n + 1, sd_up_pulse[n + 1]);
-    // printf("sd_up_weight_next: %f\n", sd_up_weight_next);
     if (*w <= sd_up_weight && *w >= sd_up_weight_next) {
-      interpolated_up = sd_up_pulse[n] + ((*w - sd_up_weight) * (sd_up_pulse[n + 1] - sd_up_pulse[n]) / (sd_up_weight_next - sd_up_weight));
-    // printf("interpolated_up: %f\n", interpolated_up);
-    // printf("interpolated_down: %f\n", interpolated_down);
-      interpolated_down = sd_down_pulse[n] + ((*w - sd_down_weight) * (sd_down_pulse[n + 1] - sd_down_pulse[n]) / (sd_down_weight_next - sd_down_weight));
+      interpolated_up = sd_up_pulse[n] + ((*w - sd_up_weight) * (sd_up_pulse[n + 1] - sd_up_pulse[n]) / 
+                                         (sd_up_weight_next - sd_up_weight));
+      interpolated_down = sd_down_pulse[n] + ((*w - sd_up_weight) * (sd_down_pulse[n + 1] - sd_down_pulse[n]) / 
+                                             (sd_up_weight_next - sd_up_weight));
       break;
     }
   }
@@ -152,21 +117,21 @@ void SelfDefineRPUDevice<T>::doDenseUpdate(T **weights, int *coincidences, RNG<T
 
   std::vector<T> sd_up_pulse = par.sd_up_pulse;
   std::vector<T> sd_down_pulse = par.sd_down_pulse;
-  T n_points = par.sd_n_points;
+  T sd_n_points = par.sd_n_points;
+  int n_points = (int)sd_n_points;
 
   T interpolated_down = 0.0;
   T interpolated_up = 0.0;
 
   for (int n = 0; n < n_points - 1; n++) {
-    T increment = abs(*max_bound - *min_bound) / n_points;
+    T increment = abs(*max_bound - *min_bound) / (n_points - 1);
     T sd_up_weight = *max_bound - (increment * n);
-    T sd_down_weight = *min_bound + (increment * n);
     T sd_up_weight_next = *max_bound - (increment * (n + 1));
-    T sd_down_weight_next = *min_bound + (increment * (n + 1));
-
     if (*w <= sd_up_weight && *w >= sd_up_weight_next) {
-      interpolated_up = sd_up_pulse[n] + ((*w - sd_up_weight) * (sd_up_pulse[n + 1] - sd_up_pulse[n]) / (sd_up_weight_next - sd_up_weight));
-      interpolated_down = sd_down_pulse[n] + ((*w - sd_down_weight) * (sd_down_pulse[n + 1] - sd_down_pulse[n]) / (sd_down_weight_next - sd_down_weight));
+      interpolated_up = sd_up_pulse[n] + ((*w - sd_up_weight) * (sd_up_pulse[n + 1] - sd_up_pulse[n]) / 
+                                         (sd_up_weight_next - sd_up_weight));
+      interpolated_down = sd_down_pulse[n] + ((*w - sd_up_weight) * (sd_down_pulse[n + 1] - sd_down_pulse[n]) / 
+                                             (sd_up_weight_next - sd_up_weight));
       break;
     }
   }
