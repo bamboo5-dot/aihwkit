@@ -815,14 +815,28 @@ class PowStepDevice(PulsedDevice):
 
 @dataclass
 class SelfDefineDevice(PulsedDevice):
+    r"""Self defined device characteristics.
 
+    This model is derived from ``PulsedDevice`` and uses all its
+    parameters. ''SelfDefineDevice'' implements a new functionality
+    where the device characteristics are defined by the user. 
+
+    Up and down pulse values are stored in selfdefine.csv and the 
+    number of points can be decreased to 2 and increased indefinitely. 
+    """
     bindings_class: ClassVar[Type] = devices.SelfDefineResistiveDeviceParameter
 
     n_points: int = 0
+    r"""The number of points in the up_pulse and down_pulse arrays.
+    """
 
     up_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    r"""Array of values that characterize the up_pulse.
+    """
     
     down_pulse: List[float] = field(default_factory=list, metadata={'hide_if': []})
+    r"""Array of values that characterize the down_pulse.
+    """
 
 ###############################################################################
 # Specific devices based on ``unit cell``.
