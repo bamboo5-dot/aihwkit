@@ -4,7 +4,7 @@ recommonmark==0.6.0
 # Runtime dependencies.
 torch>=1.7
 torchvision
-requests>=2.25,<3
+requests>=2.32.4
 numpy>=1.18
 dataclasses==0.7; python_version < '3.7'
 protobuf>=3.13.0,<4
