@@ -2,10 +2,11 @@ Sphinx==3.1.2
 sphinx-rtd-theme==0.5.2
 recommonmark==0.6.0
 # Runtime dependencies.
-torch>=1.7
+torch>=2.9.0
 torchvision
 requests>=2.25,<3
 numpy>=1.18
 dataclasses==0.7; python_version < '3.7'
 protobuf>=3.13.0,<4
 matplotlib>=3.0
+urllib3>=2.6.3 # not directly required, pinned by Snyk to avoid a vulnerability
